@@ -123,6 +123,11 @@ d2 <- 0.7
   rt <- rbind(cbind(data.frame(exp(rt0)), gr = 1),
               cbind(data.frame(exp(rt1)), gr = 0))
   
+  colnames(rt)[1:n] <- paste0('RT',1:n)
+  
+  
+  rt$ID <- 1:nrow(rt)
+  
   # RESPONSE GENERATION
   
   # Examinees with Item Preknowledge
@@ -163,58 +168,64 @@ d2 <- 0.7
   r <- rbind(cbind(data.frame(r0), gr = 1),
               cbind(data.frame(r1), gr = 0))
   
-
-##############################################################################
   
-# Prepare response time data in the long format
-  
-  rt$ID <- 1:nrow(rt)
-  
-  rt.long <- reshape(
-    data        = rt[,1:n],
-    idvar       = "ID",
-    varying     = list(colnames(rt)[1:n]),
-    timevar     = "Item",
-    times       = 1:n,
-    v.names      = "RT",
-    direction   = "long"
-  )
-  
-  rt.long$logRT <- log(rt.long$RT)
-
-# Prepare response data in the long format
+  colnames(r)[1:n] <- paste0('R',1:n)
   
   r$ID <- 1:nrow(r)
   
-  r.long <- reshape(
-    data        = r[,1:n],
+  
+# Combine Response Time and Item Response Data into one
+  
+  resp <- merge(rt,r,by=c('ID','gr'))
+  
+  
+##############################################################################
+  
+  vnames <- NULL
+  for(i in 3:(n+2)){
+    vnames <- c(vnames,c(i,i+n))
+  }
+  
+# Prepare response time data in the long format
+  
+  Y.long <- reshape(
+    data        = resp[,-2],
     idvar       = "ID",
-    varying     = list(colnames(r)[1:n]),
+    varying     = colnames(resp)[vnames],
     timevar     = "Item",
     times       = 1:n,
-    v.names      = "R",
+    v.names      = c("R",'RT'),
     direction   = "long"
   )
+  
+  Y.long <- Y.long[order(Y.long$ID),]
+  
+  colnames(Y.long) <- c('ID','Item','RT','R') 
+  
+  Y.long$RT <- log(Y.long$RT)
   
   
 # Remove missing data (relevant for real data analysis)
   
-  rt.long <- na.omit(rt.long)
-  r.long  <- na.omit(r.long)
+  Y.long <- na.omit(Y.long)
+  
+  beta0 = mean(Y.long$RT)
+  
+  alpha0 = sqrt(1/colMeans((log(rt[,1:n]) - matrix(beta0,N,n,byrow=T))^2,na.rm=TRUE))
   
 # Input data list for Stan
   
   data_rt <- list(
     J               = n,
     I               = N,
-    n_obs1          = length(rt.long$RT),
-    ind_person_obs1 = rt.long$ID,
-    ind_item_obs    = rt.long$Item,
-    RT              = rt.long$logRT,
-    n_obs2          = length(r.long$RT),
-    ind_person_obs2 = r.long$ID,
-    ind_item_obs2   = r.long$Item,
-    Y               = r.long$R
+    n_obs           = nrow(Y.long),
+    ind_person_obs  = Y.long$ID,
+    ind_item_obs    = Y.long$Item,
+    RT              = Y.long$logRT,
+    R               = Y.long$R,
+    beta0           = mean(Y.long$RT),
+    v1              = N/2,
+    v2              = N/2*mean(alpha0)
   )
   
 ##############################################################################

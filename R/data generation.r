@@ -221,7 +221,7 @@ d2 <- 0.7
     n_obs           = nrow(Y.long),
     ind_person_obs  = Y.long$ID,
     ind_item_obs    = Y.long$Item,
-    RT              = Y.long$logRT,
+    RT              = Y.long$RT,
     R               = Y.long$R,
     beta0           = mean(Y.long$RT),
     v1              = N/2,

@@ -24,11 +24,11 @@ set.seed(06152021)
 # d1  : item preknowledge effect on response accuracy
 # d2  : item preknowledge effect on response time
 
-N <- 200
-n <- 20
+N <- 500
+n <- 50
 pe <- 0.15
 pi <- 0.50
-d1 <- 0.4
+d1 <- 1
 d2 <- 0.7
 
 
@@ -45,13 +45,13 @@ d2 <- 0.7
   
   # Response time model item parameters
 
-  beta  <- rnorm(20,4.19,0.38)
-  alpha <- rnorm(20,1.42,0.37)
+  beta  <- rnorm(n,4.19,0.38)
+  alpha <- rnorm(n,1.42,0.37)
   
   # Response model item parameters
   
-  a     <- rep(1.7,20)
-  b     <- rnorm(20,0,1)
+  a     <- rep(1.7,n)
+  b     <- rnorm(n,0,1)
   
   # Sigma, correlation matrix among tau and theta
   
@@ -84,8 +84,8 @@ d2 <- 0.7
   
   # A vector for item status (0: not disclosed, 1:disclosed)
   
-  C1    <- rep(c(0,1),10)
-  C2    <- rep(0,20)
+  C1    <- rep(c(0,1),n/2)
+  C2    <- rep(0,n)
   
   # RESPONSE TIME GENERATION
   

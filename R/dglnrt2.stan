@@ -6,7 +6,7 @@
 // https://study.sagepub.com/sites/default/files/chapter16.pdf, page 10
 // https://discourse.mc-stan.org/t/assigning-bernoulli-prior-to-missing-entries-in-covariate/10219/2
 // https://mc-stan.org/docs/2_27/stan-users-guide/vectorizing-mixtures.html
-
+// https://elevanth.org/blog/2018/01/29/algebra-and-missingness/
 
 data{
   int <lower=1> I;                       // number of examinees          

@@ -24,12 +24,12 @@ set.seed(06152021)
 # d1  : item preknowledge effect on response accuracy
 # d2  : item preknowledge effect on response time
 
-N <- 500
-n <- 50
-pe <- 0.15
+N <- 200
+n <- 30
+pe <- 0.20
 pi <- 0.50
 d1 <- 1
-d2 <- 0.7
+d2 <- 1.5
 
 
   # 100*(1 - 1/exp(d1)), average % reduction in response time due to preknowledge
@@ -50,7 +50,7 @@ d2 <- 0.7
   
   # Response model item parameters
   
-  a     <- rep(1.7,n)
+  a     <- rlnorm(n,0,.5)
   b     <- rnorm(n,0,1)
   
   # Sigma, correlation matrix among tau and theta

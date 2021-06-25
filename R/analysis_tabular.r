@@ -45,24 +45,24 @@ mod <- cmdstan_model(here('R/dglnrt_tabular.stan'))
   stanfit <- rstan::read_stan_csv(fit$output_files())
 
   
-  T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
-  C <- summary(stanfit, pars = c("C"), probs = c(0.025, 0.975))$summary
+  pH <- summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary
+  pC <- summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary
   
-  auc_roc(preds=T[,1],actual=c(rep(1,75),rep(0,425)))
+  auc_roc(preds=pH[,1],actual=rt$group)
   
-  plot(density(T[76:200,1],adjust=2),xlim=c(0,1))
-  points(density(T[1:75,1],adjust = 2),type='l',lty=2)
+  plot(density(pH[rt$group==0,1],adjust=2),xlim=c(0,1))
+  points(density(pH[rt$group==1,1],adjust = 2),type='l',lty=2)
+
   
-  mean(T[1:75,1])
-  mean(T[76:500,1])
+  pC
+  auc_roc(preds=pC[,1],actual=C)
+
+  plot(density(pC[C==1,1],adjust=2),xlim=c(0,1))
+  points(density(pC[C==0,1],adjust = 2),type='l',lty=2)
   
-  table(T[1:75,1]>.7)
-  table(T[76:500,1]>.7)
+  mean(pC[C==0,1])
+  mean(pC[C==1,1])
   
-  
-  C <- summary(stanfit, pars = c("C"), probs = c(0.025, 0.975))$summary
-  
-  auc_roc(preds=C[,1],actual=rep(c(0,1),25))
   
   
   
@@ -99,7 +99,7 @@ mod <- cmdstan_model(here('R/dglnrt_tabular.stan'))
   
 # r is an N  x n tabular item response matrix
 
-  data_rt <- list(
+  data_r <- list(
     J               = n,
     I               = N,
     R               = r[,1:n])
@@ -110,12 +110,12 @@ mod <- cmdstan_model(here('R/dglnrt_tabular.stan'))
   mod <- cmdstan_model(here('R/dgIRT_tabular.stan'))
   
   fit <- mod$sample(
-    data = data_rt,
+    data = data_r,
     seed = 1234,
     chains = 4,
     parallel_chains = 4,
-    iter_warmup   = 100,
-    iter_sampling = 500,
+    iter_warmup   = 200,
+    iter_sampling = 1000,
     refresh = 10,
     adapt_delta = 0.99)
   
@@ -124,49 +124,58 @@ mod <- cmdstan_model(here('R/dglnrt_tabular.stan'))
   stanfit <- rstan::read_stan_csv(fit$output_files())
   
   
-  T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
+  pH <- summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary
   
-  auc_roc(preds=T[,1],actual=c(rep(1,N*pe),rep(0,N-N*pe)))
+  auc_roc(preds=pH[,1],actual=H)
   
-  hist(T[,7])
+  hist(pH[,7])
   
-  mean(T[1:(N*pe),1])
-  mean(T[(N*pe+1):N,1])
-  
-  
-  plot(density(T[(N*pe+1):N,1],adjust=2),xlim=c(0,1))
-  points(density(T[1:(N*pe),1],adjust = 2),type='l',lty=2)
+  mean(pH[H==0,1])
+  mean(pH[H==1,1])
   
   
-  table(T[1:(N*pe),1]>.6)
-  table(T[(N*pe+1):N,1]>.6)
+  plot(density(pH[H==1,1],adjust=2),xlim=c(0,1))
+  points(density(pH[H==0,1],adjust = 2),type='l',lty=2)
   
   
-  C <- summary(stanfit, pars = c("C"), probs = c(0.025, 0.975))$summary
-  hist(C[,7])
+  pC <- summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary
+  hist(pC[,7])
   
-  auc_roc(preds=C[,1],actual=rep(c(0,1),n/2))
+  auc_roc(preds=pC[,1],actual=C)
+  
+  
+  require(bayesplot)
+  
+  mcmc_hist_by_chain(x = stanfit,pars='pC[29]')
+  mcmc_hist(x = stanfit,pars='pC[29]')
+  
+  thetas <- summary(stanfit, pars = c("person"), probs = c(0.025, 0.975))$summary
+  hist(thetas[,7])
+  
+  thetas <- matrix(thetas[,1],nrow=200,2,byrow=TRUE)
+  
+  plot(thetas[H==1,],xlim=c(-1,1),ylim=c(-1,1))
+  cor(thetas[H==1,])
+  colMeans(thetas[H==1,])
+  
+  
+  plot(thetas[H==0,],xlim=c(-1,1),ylim=c(-1,1))
+  cor(thetas[H==0,])
+  colMeans(thetas[H==0,])
   
   
   
-  B <- as.numeric(summary(stanfit, pars = c("b"), probs = c(0.025, 0.975))$summary[,1])
+  B <- as.numeric(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary[seq(2,60,2),1])
   cor(b,B)
   plot(b,B)
   
   
   
-  A <- as.numeric(summary(stanfit, pars = c("a"), probs = c(0.025, 0.975))$summary[,1])
+  A <- exp(as.numeric(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary[seq(1,60,2),1]))
   cor(a,A)
   plot(a,A)
   
-  theta_t <- as.numeric(summary(stanfit, pars = c("theta_t"), probs = c(0.025, 0.975))$summary[,1])
-  cor(theta,theta_t)
-  plot(theta,theta_t)
-  
-  
-  theta_cc <- as.numeric(summary(stanfit, pars = c("theta_c"), probs = c(0.025, 0.975))$summary[,1])
-  cor(theta_c,theta_cc)
-  plot(theta_c,theta_cc)
+
 
   
 #######################################################################
@@ -198,8 +207,8 @@ fit <- mod$sample(
   seed = 1234,
   chains = 4,
   parallel_chains = 4,
-  iter_warmup   = 500,
-  iter_sampling = 3000,
+  iter_warmup   = 200,
+  iter_sampling = 1000,
   refresh = 10,
   adapt_delta = 0.99)
 
@@ -208,53 +217,59 @@ fit$cmdstan_summary()
 stanfit <- rstan::read_stan_csv(fit$output_files())
 
 
-T <- summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary
+pH <- summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary
 
-hist(T[,7])
-mean(T[1:40,1])
-mean(T[41:200,1])
-auc_roc(preds=T[,1],actual=c(rep(1,40),rep(0,160)))
+hist(pH[,7])
+mean(pH[H==0,1])
+mean(pH[H==1,1])
+auc_roc(preds=pH[,1],actual=H)
 
+plot(density(pH[H==1,1],adjust=2),xlim=c(0,1))
+points(density(pH[H==0,1],adjust = 2),type='l',lty=2)
 
-plot(density(T[41:200,1],adjust=2),xlim=c(0,1))
-points(density(T[1:40,1],adjust = 2),type='l',lty=2)
-
-table(T[1:40,1]>.65)
-table(T[41:200,1]>.65)
+table(H,pH[,1]>.7)
 
 
 
+pC <- summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary
 
-C <- summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary
+hist(pC[,7])
+auc_roc(preds=pC[,1],actual=C)
 
-hist(C[,7])
-auc_roc(preds=C[,1],actual=rep(c(0,1),15))
+plot(density(pC[C==1,1],adjust=2),xlim=c(0,1))
+points(density(pC[C==0,1],adjust = 2),type='l',lty=2)
 
-C
+mean(pC[C==0,1])
+mean(pC[C==1,1])
+
+
 
 
 summary(stanfit, pars = c("omega_P"), probs = c(0.025, 0.975))$summary
 summary(stanfit, pars = c("omega_I"), probs = c(0.025, 0.975))$summary
-
-A <- exp(summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(1,120,4),1])
-cor(a,A)
-plot(a,A)
+summary(stanfit, pars = c("omega_P2"), probs = c(0.025, 0.975))$summary
+summary(stanfit, pars = c("omega_I2"), probs = c(0.025, 0.975))$summary
 
 
-B <- summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(2,120,4),1]
-cor(b,B)
-plot(b,B)
 
-Al <- exp(summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(3,120,4),1])
+Al <- exp(summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(1,60,2),1])
 cor(alpha,Al)
 plot(alpha,Al)
 
-Beta <- summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(4,120,4),1]
+Beta <- summary(stanfit, pars = c('item'), probs = c(0.025, 0.975))$summary[seq(2,60,2),1]
 cor(beta,Beta)
 plot(beta,Beta)
 
 
 
+A <- exp(summary(stanfit, pars = c('item2'), probs = c(0.025, 0.975))$summary[seq(1,60,2),1])
+cor(a,A)
+plot(a,A)
+
+
+B <- summary(stanfit, pars = c('item2'), probs = c(0.025, 0.975))$summary[seq(2,60,2),1]
+cor(b,B)
+plot(b,B)
 
 
 

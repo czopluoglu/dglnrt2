@@ -9,12 +9,18 @@ require(psych)
 ################################################################################
 
 # Import data (long format)
-  
-  d <- read.csv(here('data/data_ncme2022/formB/formB.csv'))
-  
-  length(unique(d$pid))
-  length(unique(d$iid))
-  
+
+formB <- read.csv(here('data/data_ncme2022/formB/formB.csv'))
+
+# Select the first 1000 examinees
+
+d <- formB[formB$pid %in% 1:1000,]
+
+length(unique(d$pid))
+length(unique(d$iid))
+
+################################################################################
+
   data_rt <- list(
     J              = length(unique(d$iid)),
     I              = length(unique(d$pid)),
@@ -27,7 +33,7 @@ require(psych)
 
 # Compile the model syntax
 
-  mod <- cmdstan_model(here('R/ncme22/dglnrt.stan'))
+  mod <- cmdstan_model(here('R/ncme22/dglnrt/dglnrt.stan'))
 
 # Fit the model
   

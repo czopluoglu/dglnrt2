@@ -10,13 +10,14 @@ data{
 }
 
 parameters {
-  real mu_b;                 // mean for item difficulty parameters
-  real<lower=0> sigma_b;     // sd for item difficulty parameters
+  real mu_b;                  // mean for item difficulty parameters
+  real<lower=0> sigma_b;      // sd for item difficulty parameters
   
-  real<lower=0> sigma_thetat;// sd for theta_t
+  real mu_thetat;             // mean for theta_t
+  real<lower=0> sigma_thetat; // sd for theta_t
   
-  real mu_thetac;            // mean for theta_c
-  real<lower=0> sigma_thetac;// sd for theta_c
+  real mu_thetac;             // mean for theta_c
+  real<lower=0> sigma_thetac; // sd for theta_c
   
   corr_matrix[2] omega_P;    // 2 x 2 correlation matrix for person parameters
   
@@ -43,25 +44,30 @@ transformed parameters{
   vector[2] mu_P;                        // vector for mean vector of person parameters 
   vector[2] scale_P;                     // vector of standard deviations for person parameters
   cov_matrix[2] Sigma_P;                 // covariance matrix for person parameters
+  vector[J] b2;                          // vector of item difficulty parameters
 
-  mu_P[1] = 0;
+  mu_P[1] = mu_thetat;
   mu_P[2] = mu_thetac;
   
   scale_P[1] = sigma_thetat;               
   scale_P[2] = sigma_thetac;
   
   Sigma_P = quad_form_diag(omega_P, scale_P); 
+  
+  b2 = b-mean(b);
 }
 
 
 
 model{
-
+  
+  mu_thetat     ~ normal(0,1);
   sigma_thetat  ~ exponential(1);
+  
+  mu_thetac     ~ normal(0,1);
   sigma_thetac  ~ exponential(1);
   
   omega_P       ~ lkj_corr(1);
-  mu_thetac     ~ normal(0,1);
   person        ~ multi_normal(mu_P,Sigma_P);
   
   mu_b      ~ normal(0,1);
@@ -79,8 +85,8 @@ model{
       //person[p_loc[i],2] represents parameter theta_c of the (p_loc[i])th person
       
       
-      real p_t = person[p_loc[i],1] - b[i_loc[i]];  // non-cheating response
-      real p_c = person[p_loc[i],2] - b[i_loc[i]];  // cheating response
+      real p_t = person[p_loc[i],1] - b2[i_loc[i]];  // non-cheating response
+      real p_c = person[p_loc[i],2] - b2[i_loc[i]];  // cheating response
       
       // log of probability densities for each combination of two discrete parameters
       // (C,T) = {(0,0),(0,1),(1,0),(1,1)}

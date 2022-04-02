@@ -110,7 +110,7 @@ set.seed(03302022)
 ################################################################################
 
 N = 200    # number of examinees
-n = 20     # number of items
+n = 50     # number of items
 
 # Item difficulty parameters
 
@@ -127,7 +127,7 @@ th_c <- th[,2]
 
 # Randomly select (approximately) 30% of examinees as having item prekowledge
 
-H <- rbinom(N,1,.3)
+H <- rbinom(N,1,.5)
 
 # Randomly select (approximately) 50% of items as compromised
 
@@ -203,16 +203,6 @@ d <- r.long
   mod <- cmdstan_model(here('R/ncme22/dgirt/dgirt.stan'))
 
 # Fit the model
-  
-  fit <- mod$sample(
-    data = data_resp,
-    seed = 1234,
-    chains = 4,
-    parallel_chains = 4,
-    iter_warmup   = 250,
-    iter_sampling = 750,
-    refresh = 10,
-    adapt_delta = 0.99)
 
 # Compile the output files into an rstan object
   
@@ -232,7 +222,7 @@ d <- r.long
   
   T <- as.numeric(summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary[,1])
   
-  table(H,T>.55)
+  table(H,T>.6)
   
   
   C_ <- as.numeric(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
@@ -258,6 +248,9 @@ d <- r.long
   
   mean(th[,1])
   sd(th[,1])
+  
+  plot(th[,2],est.th[,2])
+  cor(th[,2],est.th[,2])
   
   mean(est.th[,2])
   sd(est.th[,2])

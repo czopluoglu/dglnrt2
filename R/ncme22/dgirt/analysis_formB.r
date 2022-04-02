@@ -61,30 +61,64 @@ fit <- mod$sample(
 
 # Analyze the parameter estimates
 
-
+  
   T <- as.numeric(summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary[,1])
-
-
-  C_ <- as.numeric(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
-
-  est.b <- summary(stanfit, pars = c("b"), probs = c(0.025, 0.975))$summary
-
+  View(summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary)
+  hist(T)
+  
+  T[which(T>0.8)]
+  
+  
+  View(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary)
+  
+  C <- as.numeric(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
+  C
+  
+  C[which(C>0.95)]
+  
+  gr <- c(rep('operational',50),rep('pilot',121))
+  
+  describeBy(C,gr)
+  
+  plot(density(C[1:50]),type='l',xlim=c(0,1),ylim=c(0,3))
+  points(density(C[51:171]),type='l')
+  
+  
   summary(stanfit, pars = c("mu_b"), probs = c(0.025, 0.975))$summary
   summary(stanfit, pars = c("sigma_b"), probs = c(0.025, 0.975))$summary
+  
+  summary(stanfit, pars = c("sigma_thetat"), probs = c(0.025, 0.975))$summary
+  summary(stanfit, pars = c("sigma_thetac"), probs = c(0.025, 0.975))$summary
+  
   summary(stanfit, pars = c("omega_P"), probs = c(0.025, 0.975))$summary
-
-
-  est.th <- matrix(summary(stanfit, pars = c("person"), probs = c(0.025, 0.975))$summary[,1],
-                   nrow=200,ncol=2,byrow=T)
-
-################################################################################
-
-par_name1 <- 'person[5,1]'
-par_name2 <- 'person[5,2]'
-
-mcmc_hist_by_chain(x = stanfit,pars=par_name1)
-mcmc_hist_by_chain(x = stanfit,pars=par_name2)
-
-par_name <- 'b[8]'
-mcmc_hist_by_chain(x = stanfit,pars=par_name)
+  
+  View(summary(stanfit, pars = c("person"), probs = c(0.025, 0.975))$summary)
+  
+  th <- matrix(summary(stanfit, pars = c("person"), probs = c(0.025, 0.975))$summary[,1],
+               1000,2,byrow=T)
+  
+  describe(th[which(T<0.5),])
+  
+  examinee_info <- read.csv("data/data_ncme2022/formB/examinee_info_FormB.csv")
+  
+  table(examinee_info$country[1:1000])
+  table(examinee_info[which(T>0.95),]$country)
+  
+  table(examinee_info$test_center[1:1000])
+  table(examinee_info[which(T>0.95),]$test_center)
+  
+  table(examinee_info$modality[1:1000])
+  table(examinee_info[which(T>0.95),]$modality)
+  
+  table(examinee_info$voucher[1:1000])
+  table(examinee_info[which(T>0.95),]$voucher)
+  
+  table(examinee_info$Flag.Condition[1:1000])
+  table(examinee_info[which(T>0.95),]$Flag.Condition)
+  
+  
+  
+  
+  View(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary)
+  
 

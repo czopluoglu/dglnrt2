@@ -228,7 +228,7 @@ d <- r.long
   C_ <- as.numeric(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
   table(C,C_>0.5)
   
-  est.b <- summary(stanfit, pars = c("b"), probs = c(0.025, 0.975))$summary
+  est.b <- summary(stanfit, pars = c("b2"), probs = c(0.025, 0.975))$summary
   plot(b,est.b[,1])
   cor(b,est.b[,1])
   
@@ -258,13 +258,13 @@ d <- r.long
   mean(th[,2])
   sd(th[,2])
   
-  par_name1 <- 'person[5,1]'
+  par_name1 <- 'person[174,1]'
   par_name2 <- 'person[5,2]'
   
   mcmc_hist_by_chain(x = stanfit,pars=par_name1)
   mcmc_hist_by_chain(x = stanfit,pars=par_name2)
   
-  par_name <- 'b[8]'
+  par_name <- 'b2[17]'
   mcmc_hist_by_chain(x = stanfit,pars=par_name)
   
 

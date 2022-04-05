@@ -127,4 +127,9 @@ require(psych)
   
   View(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary)
   
+  item <- matrix(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary[,1],
+                171,2,byrow=T)
+  
+  
+  
   

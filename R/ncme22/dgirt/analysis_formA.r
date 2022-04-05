@@ -5,7 +5,7 @@ require(cmdstanr)
 require(here)
 require(rstan)
 require(psych)
-
+require(bayesplot)
 ################################################################################
 
 # Import data (long format)
@@ -118,4 +118,10 @@ fit <- mod$sample(
   
   
   
-  View(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary)
+  View(summary(stanfit, pars = c("b"), probs = c(0.025, 0.975))$summary)
+  
+  
+  
+  par_name <- 'pH[259]'
+  mcmc_hist_by_chain(x = stanfit,pars=par_name)
+  

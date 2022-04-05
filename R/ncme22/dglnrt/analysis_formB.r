@@ -12,6 +12,8 @@ require(psych)
 
 formB <- read.csv(here('data/data_ncme2022/formB/formB.csv'))
 
+  # d <- formB
+
 # Select the first 1000 examinees
 
 d <- formB[formB$pid %in% 1:1000,]
@@ -122,3 +124,6 @@ length(unique(d$iid))
   
   
   View(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary)
+  item <- matrix(summary(stanfit, pars = c("item"), probs = c(0.025, 0.975))$summary[,1],
+                 171,2,byrow=T)
+  

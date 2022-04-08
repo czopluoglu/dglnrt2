@@ -1,0 +1,1085 @@
+---
+title: "Simultaneous Estimation of Compromised Items and Examinees with Item Preknowledge using Response Time Data"
+subtitle: ""
+author: "Cengiz Zopluoglu"
+institute: "College of Education, University of Oregon"
+date: "April 22, 2022 <br> Presented at the annual meeting of NCME, San Diego"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'uo', 'ki-fonts', 'my_custom.css', 'xaringanthemer.css']
+    #self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+<style>
+
+.blockquote {
+  border-left: 5px solid #007935;
+  background: #f9f9f9;
+  padding: 10px;
+  padding-left: 30px;
+  margin-left: 16px;
+  margin-right: 0;
+  border-radius: 0px 4px 4px 0px;
+}
+
+#infobox {
+  padding: 1em 1em 1em 4em;
+  margin-bottom: 10px;
+  border: 2px solid black;
+  border-radius: 10px;
+  background: #E6F6DC 5px center/3em no-repeat;
+}
+
+.centering[
+  float: center;
+]
+
+.left-column2 {
+  width: 50%;
+  height: 92%;
+  float: left;
+  padding-top: 1em;
+}
+
+.right-column2 {
+  width: 50%;
+  float: right;
+  padding-top: 1em;
+}
+
+.remark-code {
+  font-size: 18px;
+}
+
+.tiny .remark-code { /*Change made here*/
+  font-size: 70% !important;
+}
+
+.tiny2 .remark-code { /*Change made here*/
+  font-size: 50% !important;
+}
+
+.indent {
+  margin-left: 3em;
+}
+
+.single {
+  line-height: 1 ;
+}
+
+
+.double {
+  line-height: 2 ;
+}
+
+.title-slide h1 {
+  padding-top: 0px;
+  font-size: 40px;
+  text-align: center;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.title-slide h2 {
+  font-size: 30px;
+  text-align: center;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+.title-slide h3 {
+  font-size: 30px;
+  color: #26272A;
+  text-align: center;
+  text-shadow: none;
+  padding: 10px;
+  margin: 10px;
+  line-height: 1.2;
+}
+
+
+</style>
+
+```{R, setup, include = F}
+library(pacman)
+p_load(here, tidyverse, ggplot2, xaringan, knitr, kableExtra, xaringanthemer)
+
+#i_am("B:/UO Teaching/EDUC614/Winter22/Slide Template/template.rmd")
+
+
+red_pink <- "#e64173"
+turquoise = "#20B2AA"
+orange = "#FFA500"
+red = "#fb6107"
+blue = "#3b3b9a"
+green = "#8bb174"
+grey_light = "grey70"
+grey_mid = "grey50"
+grey_dark = "grey20"
+purple = "#6A5ACD"
+slate = "#314f4f"
+
+extra_css <- list(
+  ".red"   = list(color = "red"),
+  ".blue"  =list(color = "blue"),
+  ".red-pink" = list(color= "red_pink"),
+  ".grey-light" = list(color= "grey_light"),
+  ".purple" = list(color = "purple"),
+  ".small" = list("font-size" = "90%"))
+
+write_extra_css(css = extra_css, outfile = "my_custom.css")
+
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 6.75,
+  fig.width = 10.5,
+  warning = F,
+  message = F
+)
+opts_chunk$set(dev = "svg")
+options(device = function(file, width, height) {
+  svg(tempfile(), width = width, height = height)
+})
+
+options(knitr.table.format = "html")
+
+options(width = 120)
+
+require(here)
+```
+
+### Background
+
+- A new model to identify examinees with item preknowledge and compromised items in a single-stage analysis.
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-lwcm{background-color:#ffffff;border-color:#ffffff;font-size:18px;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-89sb{background-color:#ffffff;border-color:#ffffff;font-size:18px;text-align:center;vertical-align:middle}
+.tg .tg-y6d1{background-color:#ffffff;border-color:#ffffff;font-size:18px;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <td class="tg-lwcm">Deterministic Gated IRT Model</td>
+    <td class="tg-89sb" rowspan="2">+</td>
+    <td class="tg-lwcm">Lognormal Response Time Model</td>
+    <td class="tg-89sb" rowspan="2">+</td>
+    <td class="tg-y6d1">Additional</td>
+  </tr>
+  <tr>
+    <td class="tg-y6d1">(DG-IRT;Shu et al., 2013)</td>
+    <td class="tg-y6d1">(LNRT; van der Linden, 2006)</td>
+    <td class="tg-y6d1">Improvements</td>
+  </tr>
+</thead>
+</table>
+
+<br>
+
+- The DG-IRT model:
+  
+  - Rasch model + response accuracy data
+  
+  - Two sets of items: compromised and uncompromised
+
+  - Two latent variables: true ability, $\theta_t$, and cheating ability, $\theta_c$,
+  
+  - The posterior probability of cheating ability being higher than true ability, $P(\theta_c > \theta_t)$ ---> item preknowledge
+  
+
+---
+
+### Background
+
+- The LNRT model: 
+
+  - A latent trait model for response times 
+  
+  - Hypothesizes a latent speed parameter for each examinee, $\tau$
+  
+  - Two item parameters: time-intensity ( $\beta$ ) and time-discrimination ( $\alpha$)
+
+- The new model: 
+
+  - synthesizes the ideas from DG-IRT and LNRT
+  
+  - No assumption that the compromised items are known
+  
+  - Direct estimate for item preknowledge
+  
+  - Marginalization of discrete parameters in the model
+  
+---
+
+### Model Description
+
+$$t_{ij}^* | \tau_{ti},\tau_{ci},H_i,\beta_j,\alpha_j,C_j \sim \mathcal{N}(\mu_{ij},\alpha_j^{-2})$$
+$t_{ij}^*$ is the observed logresponse time for examinee $i$ on item $j$.
+
+- **Person parameters**:
+
+  - $H_i$: examinee item preknowledge status (1:yes, 0:no)
+  
+  - $\tau_{ti}$: latent speed parameter for uncompromised items
+  
+  - $\tau_{ci}$: latent speed parameter for compromised items
+
+- **Item parameters**:
+
+  - $C_j$: item compromise status (1:yes, 0:no)
+  
+  - $\beta_j$: time-intensity parameter
+  
+  - $\alpha_j$: time-discrimination parameter
+
+- **Gating mechanism**
+
+.indent[
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>&#x03BC;<!-- μ --></mi>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi>i</mi>
+      <mi>j</mi>
+    </mrow>
+  </msub>
+  <mo>=</mo>
+  <mrow>
+    <mo>{</mo>
+    <mtable rowspacing="4pt" columnspacing="1em">
+      <mtr>
+        <mtd>
+          <msub>
+            <mi>&#x03B2;<!-- β --></mi>
+            <mi>j</mi>
+          </msub>
+          <mo>&#x2212;<!-- − --></mo>
+          <msub>
+            <mi>&#x03C4;<!-- τ --></mi>
+            <mrow class="MJX-TeXAtom-ORD">
+              <mi>c</mi>
+              <mi>i</mi>
+            </mrow>
+          </msub>
+        </mtd>
+        <mtd>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mtext>, when&#xA0;</mtext>
+          </mrow>
+          <msub>
+            <mi>C</mi>
+            <mi>j</mi>
+          </msub>
+          <mo>=</mo>
+          <mn>1</mn>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mtext>&#xA0;and&#xA0;</mtext>
+          </mrow>
+          <msub>
+            <mi>H</mi>
+            <mi>i</mi>
+          </msub>
+          <mo>=</mo>
+          <mn>1</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <msub>
+            <mi>&#x03B2;<!-- β --></mi>
+            <mi>j</mi>
+          </msub>
+          <mo>&#x2212;<!-- − --></mo>
+          <msub>
+            <mi>&#x03C4;<!-- τ --></mi>
+            <mrow class="MJX-TeXAtom-ORD">
+              <mi>t</mi>
+              <mi>i</mi>
+            </mrow>
+          </msub>
+        </mtd>
+        <mtd>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mtext>, otherwise&#xA0;</mtext>
+          </mrow>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo fence="true" stretchy="true" symmetric="true"></mo>
+  </mrow>
+</math>
+]
+
+---
+
+#### **Breaking down the density for the distribution of the observed logresponse time**
+
+$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i,\beta_j,\alpha_j,C_j)$$
+
+$$\downarrow$$
+This density can be written as a sum of four terms that represent all possible combinations of $H_i$ and $T_j$:
+
+<br>
+<br>
+
+- An **examinee with item preknowledge** responds to a **compromised item** ( $H_i = 1$, $C_j = 1$)
+
+$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 1,\beta_j,\alpha_j,C_j = 1) = f(t_{ij}^*; \tau_{ci},\beta_j,\alpha_j) \times P(H_i=1) \times P(C_j=1)$$
+<br>
+
+- An **examinee with item preknowledge** responds to an **uncompromised item** ( $H_i = 1$, $C_j = 0$)
+
+$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 1,\beta_j,\alpha_j,C_j = 0) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=1) \times P(C_j=0)$$
+
+---
+
+- An **examinee with no item preknowledge** responds to a **compromised item** ( $H_i = 0$, $C_j = 1$)
+
+$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 0,\beta_j,\alpha_j,C_j = 1) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=0) \times P(C_j=1)$$
+<br>
+
+- An **examinee with no item preknowledge** responds to an **uncompromised item** ( $H_i = 0$, $C_j = 0$)
+
+$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 0,\beta_j,\alpha_j,C_j = 0) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=0) \times P(C_j=0)$$
+---
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="right left right left right left right left right left right left" rowspacing="3pt" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" displaystyle="true">
+    <mtr>
+      <mtd>
+        <mi>f</mi>
+        <mo stretchy="false">(</mo>
+        <msubsup>
+          <mi>t</mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>i</mi>
+            <mi>j</mi>
+          </mrow>
+          <mo>&#x2217;<!-- ∗ --></mo>
+        </msubsup>
+        <mo>;</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>t</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>c</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>H</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B2;<!-- β --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B1;<!-- α --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>C</mi>
+          <mi>j</mi>
+        </msub>
+        <mo stretchy="false">)</mo>
+        <mo>=</mo>
+        <mrow class="MJX-TeXAtom-ORD">
+
+        </mrow>
+      </mtd>
+      <mtd>
+        <mi>f</mi>
+        <mo stretchy="false">(</mo>
+        <msubsup>
+          <mi>t</mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>i</mi>
+            <mi>j</mi>
+          </mrow>
+          <mo>&#x2217;<!-- ∗ --></mo>
+        </msubsup>
+        <mo>;</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>c</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B2;<!-- β --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B1;<!-- α --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>H</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>1</mn>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>C</mi>
+          <mi>j</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>1</mn>
+        <mo stretchy="false">)</mo>
+        <mo>+</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd />
+      <mtd>
+        <mi>f</mi>
+        <mo stretchy="false">(</mo>
+        <msubsup>
+          <mi>t</mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>i</mi>
+            <mi>j</mi>
+          </mrow>
+          <mo>&#x2217;<!-- ∗ --></mo>
+        </msubsup>
+        <mo>;</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>t</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B2;<!-- β --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B1;<!-- α --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>H</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>1</mn>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>C</mi>
+          <mi>j</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>0</mn>
+        <mo stretchy="false">)</mo>
+        <mo>+</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd />
+      <mtd>
+        <mi>f</mi>
+        <mo stretchy="false">(</mo>
+        <msubsup>
+          <mi>t</mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>i</mi>
+            <mi>j</mi>
+          </mrow>
+          <mo>&#x2217;<!-- ∗ --></mo>
+        </msubsup>
+        <mo>;</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>t</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B2;<!-- β --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B1;<!-- α --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>H</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>0</mn>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>C</mi>
+          <mi>j</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>1</mn>
+        <mo stretchy="false">)</mo>
+        <mo>+</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd />
+      <mtd>
+        <mi>f</mi>
+        <mo stretchy="false">(</mo>
+        <msubsup>
+          <mi>t</mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>i</mi>
+            <mi>j</mi>
+          </mrow>
+          <mo>&#x2217;<!-- ∗ --></mo>
+        </msubsup>
+        <mo>;</mo>
+        <msub>
+          <mi>&#x03C4;<!-- τ --></mi>
+          <mrow class="MJX-TeXAtom-ORD">
+            <mi>t</mi>
+            <mi>i</mi>
+          </mrow>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B2;<!-- β --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo>,</mo>
+        <msub>
+          <mi>&#x03B1;<!-- α --></mi>
+          <mi>j</mi>
+        </msub>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>H</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>0</mn>
+        <mo stretchy="false">)</mo>
+        <mo>&#x00D7;<!-- × --></mo>
+        <mi>P</mi>
+        <mo stretchy="false">(</mo>
+        <msub>
+          <mi>C</mi>
+          <mi>j</mi>
+        </msub>
+        <mo>=</mo>
+        <mn>0</mn>
+        <mo stretchy="false">)</mo>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
+
+<br>
+
+**A very simplified version of corresponding model syntax in Stan:**
+
+.tiny[
+```{r echo=T,eval=F}
+
+for(i in 1:N)
+  for (j in 1:I) {
+    
+      real p_t = beta[j] - tau_t[i];
+      real p_c = beta[j] - tau_c[i];
+      
+      real lprt1 = log1m(pC[j]) + log1m(pH[i]) + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt2 = log1m(pC[j]) + log(pH[i])   + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt3 =  log(pC[j])  + log1m(pH[i]) + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt4 =  log(pC[j])  + log(pH[i])   + normal_lpdf(Y[i,j] | p_c, 1/alpha[j]));  
+      
+      target += log_sum_exp([lprt1, lprt2, lprt3, lprt4]);
+  }
+}
+  
+```
+]
+
+---
+
+### Dataset description
+
+- I used a random sample of 1000 examinees from Form A with 171 items. 
+
+- This subset of Form A
+
+  - had 50 operational items that all 1000 examinees responded to, and
+
+  - had 121 pilot items that a different set of 100-150 examinees responded to. 
+  
+- Each examinee responded to 65 items (50 operational + 15 pilot items)
+
+Data structure was relatively sparse due to missing data by design for the pilot items. Only 38% of the data matrix was complete.
+
+![](data.PNG)
+
+---
+
+### Model Fitting
+
+- The model was fitted using Bayesian estimation through the `rstan` package (Stan Development Team,
+2018) in R (R Core Team, 2018).
+
+- There were four chains using 1,000 iterations, and model parameter estimates from posterior densities were
+calculated using 750 iterations after 250 warm-up iterations. 
+
+- An informal post at the link - https://cengiz.me/posts/dglnrt2/ - includes
+
+  - a more detailed description of the model, 
+  
+  - parameter constraints necessary for model identification,
+  
+  - prior specifications, and
+  
+  - and two example analysis with all relevant R and Stan code.
+
+- The code for the dataset used in this particular presentation can be found in the following Github repo:
+
+.indent[https://github.com/czopluoglu/dglnrt2/tree/main/R/ncme22/dglnrt]
+
+---
+
+```{r,echo=FALSE,eval=TRUE}
+require(MASS)
+require(MBESS)
+require(matrixStats)
+require(cmdstanr)
+require(here)
+require(rstan)
+require(psych)
+require(bayesplot)
+require(ggplot)
+require(gridExtra)
+
+load("B:/Ongoing_Research/Murat/dglnrt2/dglnrt2/data/data_ncme2022/formA/DGLNRT_FormA_fitted_model_first1000examinee.RData")
+
+stanfit_data <- stanfit
+data_ <- d
+
+load("B:/Ongoing_Research/Murat/dglnrt2/dglnrt2/data/data_ncme2022/formA/DGLNRT_FormA_simulated null condition_1000examinee.RData")
+
+stanfit_null <- stanfit
+
+source("https://raw.githubusercontent.com/betanalpha/knitr_case_studies/master/qr_regression/stan_utility.R")
+
+#check_treedepth(stanfit_data)
+
+#check_energy(stanfit_data)
+
+#check_div(stanfit_data)
+
+```
+
+### Results
+
+**Model Convergence**
+
+The model convergence was checked by visual inspection of the sampling chains and with the split-chain $\hat{R}$ statistic.
+
+The split-chain $\hat{R}$ statistic was less than 1.01 for most parameters in the model, with a maximum value of 1.032 for one of the item parameters ( $\beta_{30}$).
+
+```{r,echo=FALSE,eval=TRUE,fig.height=4,fig.width=8}
+
+pH_r <- summary(stanfit_data, pars = c("pH"), probs = c(0.025, 0.975))$summary[,7]
+pC_r <- summary(stanfit_data, pars = c("pC"), probs = c(0.025, 0.975))$summary[,7]
+item_r <- summary(stanfit_data, pars = c("item"), probs = c(0.025, 0.975))$summary[,7]
+person_r <- summary(stanfit_data, pars = c("person"), probs = c(0.025, 0.975))$summary[,7]
+
+p1 <- ggplot(mapping = aes(pH_r)) + 
+  geom_histogram(bins = 30,fill="transparent",color="black") +
+   theme_bw() +
+  theme(title =element_text(size=9),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  ggtitle(expression(paste(hat(R)," statstics for P(H=1) parameter estimates ")))+
+  xlab('')+
+  ylab('')
+
+p2 <- ggplot(mapping = aes(pC_r)) + 
+  geom_histogram(bins = 30,fill="transparent",color="black") +
+   theme_bw() +
+  theme(title =element_text(size=9),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  ggtitle(expression(paste(hat(R)," statstics for P(C=1) parameter estimates ")))+
+  xlab('')+
+  ylab('')
+
+p3 <- ggplot(mapping = aes(item_r)) + 
+  geom_histogram(bins = 30,fill="transparent",color="black") +
+   theme_bw() +
+  theme(title =element_text(size=9),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  ggtitle(expression(paste(hat(R)," statstics for item parameter estimates (", alpha,", ",beta,")")))+
+  xlab('')+
+  ylab('')
+
+p4 <- ggplot(mapping = aes(person_r)) + 
+  geom_histogram(bins = 30,fill="transparent",color="black") +
+   theme_bw() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        title =element_text(size=9)) +
+  ggtitle(expression(paste(hat(R)," statstics for person parameter estimates (", tau[t],", ",tau[c],")")))+
+  xlab('')+
+  ylab('')
+
+grid.arrange(p1,p2,p3,p4,ncol=2,nrow=2)
+```
+
+---
+
+### Results
+
+**Model Convergence**
+
+The inspection of trace plots didn't indicate any pathological behavior during sampling. Below are the trace plots for a random selection from each parameter type.
+
+```{r,echo=FALSE,eval=TRUE,fig.height=4.5,fig.width=8}
+
+  s1 <- sample(1:1000,1)
+  s2 <- sample(1:171,1)
+  s3 <- sample(1:171,1)
+  s4 <- sample(1:171,1)
+  s5 <- sample(1:1000,1)
+  s6 <- sample(1:1000,1)
+
+  mcmc_trace(x    = stanfit_data,
+             pars = c(paste0('pH[',s1,']'),
+                      paste0('pC[',s2,']'),
+                      paste0('item[',s3,',1]'),
+                      paste0('item[',s4,',2]'),
+                      paste0('person[',s5,',1]'),
+                      paste0('person[',s6,',2]')))
+
+```
+
+---
+
+### Results
+
+**Probability Estimates of Being Compromised for Operational and Pilot Items**
+
+.pull-left[
+
+<center> IT Certification Data </center>
+
+```{r,echo=FALSE,eval=TRUE,fig.height=4.5,fig.width=4}
+
+  C <- as.numeric(summary(stanfit_data, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
+  gr <- factor(c(rep('Operational',50),rep('Pilot',121)))
+  
+  C_ <- data.frame(C = C,gr=gr)
+  
+  ggplot(data = C_, mapping = aes(x = C))+
+    geom_histogram(bins = 30,fill="transparent",color="black")+
+    facet_wrap(~gr,nrow=2,ncol=1) + 
+    theme_bw()+
+    xlab('Probability Estimates of Being Compromised')+
+    xlim(c(0,1))
+
+```
+]
+
+.pull-right[
+
+- The probability estimates of being compromised ranged 
+
+  - from 0.71 to 0.99 with a mean of 0.96 for **50 operational items**.
+
+  - from 0.13 to 0.91 with a mean of 0.58 for **121 pilot items**.
+
+- If we use 0.91 as a cut-off point, the model indicated that 47 out of 50 operational items were potentially compromised.
+
+]
+
+---
+
+### Results
+
+**Probability Estimates of Being Compromised for Operational and Pilot Items**
+
+.pull-left[
+
+<center> Simulated Data - Null Condition </center>
+
+```{r,echo=FALSE,eval=TRUE,fig.height=4.5,fig.width=4}
+
+  C <- as.numeric(summary(stanfit_null, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
+  gr <- factor(c(rep('Operational',50),rep('Pilot',121)))
+  
+  C_ <- data.frame(C = C,gr=gr)
+  
+  ggplot(data = C_, mapping = aes(x = C))+
+    geom_histogram(bins = 30,fill="transparent",color="black")+
+    facet_wrap(~gr,nrow=2,ncol=1) + 
+    theme_bw()+
+    xlab('Probability Estimates of Being Compromised')+
+    xlim(c(0,1))
+
+```
+]
+
+.pull-right[
+
+- To observe the model behavior for the same set of parameters of being compromised, we simulated data with no item preknowledge.
+
+- While simulating data, we used the estimates from real data analysis for the item parameters ( $\beta$, $\alpha$) and true latent speed parameters ( $\tau_t$). The exact structure of missingness was replicated by replacing values with NAs. 
+
+- The distribution of the estimates of being compromised for simulated null condition indicated that the model was picking up some signals in the real data for the operational items.
+
+]
+
+---
+
+### Results
+
+**Probability Estimates of Item Preknowledge for Examinees**
+
+.pull-left[
+
+```{r,echo=FALSE,eval=TRUE,fig.height=5,fig.width=4}
+
+ T1 <- as.numeric(summary(stanfit_data, pars = c("pH"), probs = c(0.025, 0.975))$summary[,1])
+ T2 <- as.numeric(summary(stanfit, pars = c("pH"), probs = c(0.025, 0.975))$summary[,1])
+ gr <- factor(c(rep('IT Certification Data',1000),rep('Simulated Data - Null Condition',1000)))
+  
+ T_ <- data.frame(T=c(T1,T2),G=gr)  
+  
+  ggplot(data = T_, mapping = aes(x = T))+
+    geom_histogram(bins = 30,fill="transparent",color="black")+
+    theme_bw()+
+     facet_wrap(~G,nrow=2,ncol=1) + 
+    xlab('Probability Estimates of Having Item Preknowledge')+
+    xlim(c(0,1))+
+    ggtitle('')
+  
+ C <- as.numeric(summary(stanfit_data, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
+  
+  #length(which(T1>0.9))
+  
+  # loc <- which(T1>0.9)
+  # loc2 <- which(C>0.91)
+  
+  # sub1 <- data_[data_$pid%in%loc & data_$iid%in%loc2,]
+  # sub2 <- data_[data_$pid%in%loc & !data_$iid%in%loc2,]
+  # sub3 <- data_[!data_$pid%in%loc & data_$iid%in%loc2,]
+  # sub4 <- data_[!data_$pid%in%loc & !data_$iid%in%loc2,]
+  
+  # mean(sub1$time)
+  # mean(sub2$time)
+  # mean(sub3$time)
+  # mean(sub4$time)
+  
+  
+```
+]
+
+.pull-right[
+
+- The probability estimates of having item preknowledge 
+
+  - from 0.04 to 0.98 with a mean of 0.54 for 1000 real examinees in the IT Certification dataset.
+
+  - from 0.43 to 0.64 with a mean of 0.58 for 100 simulees in the null condition.
+
+- If we use 0.9 as a cut-off point, the model indicated that 96 out of 1000 examinees had potentially accessed some compromised items before the test.
+]
+
+---
+
+```{r echo=F,eval=F}
+  examinee_info <- read.csv("data/data_ncme2022/formA/examinee_info_FormA.csv")[1:1000,]
+  
+  table(examinee_info[which(T1<0.9),]$country)
+  table(examinee_info[which(T1>0.9),]$country)
+  
+  table(examinee_info[which(T1<0.9),]$modality)
+  table(examinee_info[which(T1>0.9),]$modality)
+  
+  table(examinee_info[which(T1<0.9),]$voucher)
+  table(examinee_info[which(T1>0.9),]$voucher)
+  
+  table(examinee_info[which(T1<0.9),]$Flag.Condition)
+  table(examinee_info[which(T1>0.9),]$Flag.Condition)
+```  
+  
+  
+### Results
+
+**Comparison of Model Identified Subgroup (N = 96) and Others (N=904)**
+
+- Average Response Time
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-z1yq{font-size:13px;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-z1yq"></th>
+    <th class="tg-z1yq">Model Identified <br> Subset of Items <br> P(C=1) &gt; 0.91 (N=47)</th>
+    <th class="tg-z1yq">Other Items <br> P(C=1) &lt;0.91 (N=124) </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-z1yq">Other Examineees <br> P(H=1) &lt;0.9</td>
+    <td class="tg-z1yq">98.2</td>
+    <td class="tg-z1yq">103.8</td>
+  </tr>
+  <tr>
+    <td class="tg-z1yq">Model Identified Subgroup of Examinees <br> P(H=1) &gt; 0.9</td>
+    <td class="tg-z1yq">33.5</td>
+    <td class="tg-z1yq">86.1</td>
+  </tr>
+</tbody>
+</table>
+
+- Other characteristics: country, online proctoring, voucher misuse, flagged by company (RSI)
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-baqh"></th>
+    <th class="tg-baqh">Other <br> Examinees (N = 904)</th>
+    <th class="tg-baqh">Model Identified <br>Subgroup of Examinees (N=96)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-baqh">Country X</td>
+    <td class="tg-baqh">18.8%</td>
+    <td class="tg-baqh">64.5%</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Online Proctoring</td>
+    <td class="tg-baqh">61.5%</td>
+    <td class="tg-baqh">100%</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Voucher Misuse</td>
+    <td class="tg-baqh">11.2%</td>
+    <td class="tg-baqh">78.1%</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Flagged by the company<br>(RSI)</td>
+    <td class="tg-baqh">10.8%</td>
+    <td class="tg-baqh">93.8%</td>
+  </tr>
+</tbody>
+</table>
+
+---
+
+### Concluding Remarks
+
+- I can argue that a certain subgroup of examinees responded significantly faster to operational items than the rest of the group.
+  
+- The proposed model 
+
+  - is designed to pick such a signal and were successfully fitted to a random sample from the dataset,
+  
+  - successfully separated a particular group of examinees in the data from the rest of the group by estimating the probability of item preknowledge for each examinee,
+  
+  - successfully separated operational items from the pilot items by estimating a probability of being compromised for each item.
+  
+- In the context of this presentation, I tend to interpret faster response times as an indication of item preknowledge. If there are other plausible explanations for faster response times in operational items for this subgroup of examinees, this inference is void.
+
+- The idea can be extended and used for response accuracy data (work in progress!)
+
+- Response time and response accuracy pieces can be combined. It becomes a very complex model but can potentially yield the highest performance (work in progress!)
+  
+---
+
+### Limitations
+
+- There are some, but I am sorry I am running out of time :)
+
+<br>
+<br> 
+<br>
+
+<center>
+
+## Thank you!
+
+<br>
+
+### Questions --> cengiz@uoregon.edu
+  

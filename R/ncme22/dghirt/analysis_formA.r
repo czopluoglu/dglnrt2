@@ -5,6 +5,7 @@ require(cmdstanr)
 require(here)
 require(rstan)
 require(psych)
+require(bayesplot)
 
 ################################################################################
 
@@ -79,7 +80,7 @@ fit <- mod$sample(
   C <- as.numeric(summary(stanfit, pars = c("pC"), probs = c(0.025, 0.975))$summary[,1])
   C
   
-  C[which(C>0.95)]
+  C[which(C>0.8)]
   
   gr <- c(rep('operational',50),rep('pilot',121))
   
@@ -109,7 +110,7 @@ fit <- mod$sample(
   describe(tau)
   
   item_rt <- matrix(summary(stanfit, pars = c("item_rt"), probs = c(0.025, 0.975))$summary[,1],
-                1000,2,byrow=T)
+                171,2,byrow=T)
   
   View(summary(stanfit, pars = c("item_rt"), probs = c(0.025, 0.975))$summary)
   
@@ -156,4 +157,9 @@ fit <- mod$sample(
   
   table(examinee_info$Flag.Condition[1:1000])
   table(examinee_info[which(T>0.95),]$Flag.Condition)
+  
+  
+  par_name <- 'pC[141]'
+  mcmc_hist_by_chain(x = stanfit,pars=par_name)
+  
 

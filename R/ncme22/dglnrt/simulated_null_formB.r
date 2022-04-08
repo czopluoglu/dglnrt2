@@ -213,6 +213,9 @@ describe(ipar)
 
 
 
+par_name <- 'item[32,2]'
+mcmc_hist_by_chain(x = stanfit,pars=par_name)
+
 
 
 

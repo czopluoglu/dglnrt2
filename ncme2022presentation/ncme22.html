@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Simultaneous Estimation of Compromised Items and Examinees with Item Preknowledge using Response Time Data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Cengiz Zopluoglu" />
+    <script src="ncme22_files/header-attrs-2.11/header-attrs.js"></script>
+    <link href="ncme22_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="ncme22_files/remark-css-0.0.1/uo.css" rel="stylesheet" />
+    <link href="ncme22_files/remark-css-0.0.1/ki-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my_custom.css" type="text/css" />
+    <link rel="stylesheet" href="xaringanthemer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simultaneous Estimation of Compromised Items and Examinees with Item Preknowledge using Response Time Data
+### Cengiz Zopluoglu
+### College of Education, University of Oregon
+### April 22, 2022 <br> Presented at the annual meeting of NCME, San Diego
+
+---
+
+
+&lt;style&gt;
+
+.blockquote {
+  border-left: 5px solid #007935;
+  background: #f9f9f9;
+  padding: 10px;
+  padding-left: 30px;
+  margin-left: 16px;
+  margin-right: 0;
+  border-radius: 0px 4px 4px 0px;
+}
+
+#infobox {
+  padding: 1em 1em 1em 4em;
+  margin-bottom: 10px;
+  border: 2px solid black;
+  border-radius: 10px;
+  background: #E6F6DC 5px center/3em no-repeat;
+}
+
+.centering[
+  float: center;
+]
+
+.left-column2 {
+  width: 50%;
+  height: 92%;
+  float: left;
+  padding-top: 1em;
+}
+
+.right-column2 {
+  width: 50%;
+  float: right;
+  padding-top: 1em;
+}
+
+.remark-code {
+  font-size: 18px;
+}
+
+.tiny .remark-code { /*Change made here*/
+  font-size: 70% !important;
+}
+
+.tiny2 .remark-code { /*Change made here*/
+  font-size: 50% !important;
+}
+
+.indent {
+  margin-left: 3em;
+}
+
+.single {
+  line-height: 1 ;
+}
+
+
+.double {
+  line-height: 2 ;
+}
+
+.title-slide h1 {
+  padding-top: 0px;
+  font-size: 40px;
+  text-align: center;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.title-slide h2 {
+  font-size: 30px;
+  text-align: center;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+.title-slide h3 {
+  font-size: 30px;
+  color: #26272A;
+  text-align: center;
+  text-shadow: none;
+  padding: 10px;
+  margin: 10px;
+  line-height: 1.2;
+}
+
+
+&lt;/style&gt;
+
+
+
+### Background
+
+- A new model to identify examinees with item preknowledge and compromised items in a single-stage analysis.
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-lwcm{background-color:#ffffff;border-color:#ffffff;font-size:18px;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-89sb{background-color:#ffffff;border-color:#ffffff;font-size:18px;text-align:center;vertical-align:middle}
+.tg .tg-y6d1{background-color:#ffffff;border-color:#ffffff;font-size:18px;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-lwcm"&gt;Deterministic Gated IRT Model&lt;/td&gt;
+    &lt;td class="tg-89sb" rowspan="2"&gt;+&lt;/td&gt;
+    &lt;td class="tg-lwcm"&gt;Lognormal Response Time Model&lt;/td&gt;
+    &lt;td class="tg-89sb" rowspan="2"&gt;+&lt;/td&gt;
+    &lt;td class="tg-y6d1"&gt;Additional&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-y6d1"&gt;(DG-IRT;Shu et al., 2013)&lt;/td&gt;
+    &lt;td class="tg-y6d1"&gt;(LNRT; van der Linden, 2006)&lt;/td&gt;
+    &lt;td class="tg-y6d1"&gt;Improvements&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;/table&gt;
+
+&lt;br&gt;
+
+- The DG-IRT model:
+  
+  - Rasch model + response accuracy data
+  
+  - Two sets of items: compromised and uncompromised
+
+  - Two latent variables: true ability, `\(\theta_t\)`, and cheating ability, `\(\theta_c\)`,
+  
+  - The posterior probability of cheating ability being higher than true ability, `\(P(\theta_c &gt; \theta_t)\)` ---&gt; item preknowledge
+  
+
+---
+
+### Background
+
+- The LNRT model: 
+
+  - A latent trait model for response times 
+  
+  - Hypothesizes a latent speed parameter for each examinee, `\(\tau\)`
+  
+  - Two item parameters: time-intensity ( `\(\beta\)` ) and time-discrimination ( `\(\alpha\)`)
+
+- The new model: 
+
+  - synthesizes the ideas from DG-IRT and LNRT
+  
+  - No assumption that the compromised items are known
+  
+  - Direct estimate for item preknowledge
+  
+  - Marginalization of discrete parameters in the model
+  
+---
+
+### Model Description
+
+`$$t_{ij}^* | \tau_{ti},\tau_{ci},H_i,\beta_j,\alpha_j,C_j \sim \mathcal{N}(\mu_{ij},\alpha_j^{-2})$$`
+`\(t_{ij}^*\)` is the observed logresponse time for examinee `\(i\)` on item `\(j\)`.
+
+- **Person parameters**:
+
+  - `\(H_i\)`: examinee item preknowledge status (1:yes, 0:no)
+  
+  - `\(\tau_{ti}\)`: latent speed parameter for uncompromised items
+  
+  - `\(\tau_{ci}\)`: latent speed parameter for compromised items
+
+- **Item parameters**:
+
+  - `\(C_j\)`: item compromise status (1:yes, 0:no)
+  
+  - `\(\beta_j\)`: time-intensity parameter
+  
+  - `\(\alpha_j\)`: time-discrimination parameter
+
+- **Gating mechanism**
+
+.indent[
+
+&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;
+  &lt;msub&gt;
+    &lt;mi&gt;&amp;#x03BC;&lt;!-- μ --&gt;&lt;/mi&gt;
+    &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+      &lt;mi&gt;i&lt;/mi&gt;
+      &lt;mi&gt;j&lt;/mi&gt;
+    &lt;/mrow&gt;
+  &lt;/msub&gt;
+  &lt;mo&gt;=&lt;/mo&gt;
+  &lt;mrow&gt;
+    &lt;mo&gt;{&lt;/mo&gt;
+    &lt;mtable rowspacing="4pt" columnspacing="1em"&gt;
+      &lt;mtr&gt;
+        &lt;mtd&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/msub&gt;
+          &lt;mo&gt;&amp;#x2212;&lt;!-- − --&gt;&lt;/mo&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+            &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+              &lt;mi&gt;c&lt;/mi&gt;
+              &lt;mi&gt;i&lt;/mi&gt;
+            &lt;/mrow&gt;
+          &lt;/msub&gt;
+        &lt;/mtd&gt;
+        &lt;mtd&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mtext&gt;, when&amp;#xA0;&lt;/mtext&gt;
+          &lt;/mrow&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;C&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/msub&gt;
+          &lt;mo&gt;=&lt;/mo&gt;
+          &lt;mn&gt;1&lt;/mn&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mtext&gt;&amp;#xA0;and&amp;#xA0;&lt;/mtext&gt;
+          &lt;/mrow&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;H&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/msub&gt;
+          &lt;mo&gt;=&lt;/mo&gt;
+          &lt;mn&gt;1&lt;/mn&gt;
+        &lt;/mtd&gt;
+      &lt;/mtr&gt;
+      &lt;mtr&gt;
+        &lt;mtd&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/msub&gt;
+          &lt;mo&gt;&amp;#x2212;&lt;!-- − --&gt;&lt;/mo&gt;
+          &lt;msub&gt;
+            &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+            &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+              &lt;mi&gt;t&lt;/mi&gt;
+              &lt;mi&gt;i&lt;/mi&gt;
+            &lt;/mrow&gt;
+          &lt;/msub&gt;
+        &lt;/mtd&gt;
+        &lt;mtd&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mtext&gt;, otherwise&amp;#xA0;&lt;/mtext&gt;
+          &lt;/mrow&gt;
+        &lt;/mtd&gt;
+      &lt;/mtr&gt;
+    &lt;/mtable&gt;
+    &lt;mo fence="true" stretchy="true" symmetric="true"&gt;&lt;/mo&gt;
+  &lt;/mrow&gt;
+&lt;/math&gt;
+]
+
+---
+
+#### **Breaking down the density for the distribution of the observed logresponse time**
+
+`$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i,\beta_j,\alpha_j,C_j)$$`
+
+`$$\downarrow$$`
+This density can be written as a sum of four terms that represent all possible combinations of `\(H_i\)` and `\(T_j\)`:
+
+&lt;br&gt;
+&lt;br&gt;
+
+- An **examinee with item preknowledge** responds to a **compromised item** ( `\(H_i = 1\)`, `\(C_j = 1\)`)
+
+`$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 1,\beta_j,\alpha_j,C_j = 1) = f(t_{ij}^*; \tau_{ci},\beta_j,\alpha_j) \times P(H_i=1) \times P(C_j=1)$$`
+&lt;br&gt;
+
+- An **examinee with item preknowledge** responds to an **uncompromised item** ( `\(H_i = 1\)`, `\(C_j = 0\)`)
+
+`$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 1,\beta_j,\alpha_j,C_j = 0) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=1) \times P(C_j=0)$$`
+
+---
+
+- An **examinee with no item preknowledge** responds to a **compromised item** ( `\(H_i = 0\)`, `\(C_j = 1\)`)
+
+`$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 0,\beta_j,\alpha_j,C_j = 1) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=0) \times P(C_j=1)$$`
+&lt;br&gt;
+
+- An **examinee with no item preknowledge** responds to an **uncompromised item** ( `\(H_i = 0\)`, `\(C_j = 0\)`)
+
+`$$f(t_{ij}^*; \tau_{ti},\tau_{ci},H_i = 0,\beta_j,\alpha_j,C_j = 0) = f(t_{ij}^*; \tau_{ti},\beta_j,\alpha_j) \times P(H_i=0) \times P(C_j=0)$$`
+---
+
+&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="block"&gt;
+  &lt;mtable columnalign="right left right left right left right left right left right left" rowspacing="3pt" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" displaystyle="true"&gt;
+    &lt;mtr&gt;
+      &lt;mtd&gt;
+        &lt;mi&gt;f&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msubsup&gt;
+          &lt;mi&gt;t&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/mrow&gt;
+          &lt;mo&gt;&amp;#x2217;&lt;!-- ∗ --&gt;&lt;/mo&gt;
+        &lt;/msubsup&gt;
+        &lt;mo&gt;;&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;t&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;c&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;H&lt;/mi&gt;
+          &lt;mi&gt;i&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B1;&lt;!-- α --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;C&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+
+        &lt;/mrow&gt;
+      &lt;/mtd&gt;
+      &lt;mtd&gt;
+        &lt;mi&gt;f&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msubsup&gt;
+          &lt;mi&gt;t&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/mrow&gt;
+          &lt;mo&gt;&amp;#x2217;&lt;!-- ∗ --&gt;&lt;/mo&gt;
+        &lt;/msubsup&gt;
+        &lt;mo&gt;;&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;c&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B1;&lt;!-- α --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;H&lt;/mi&gt;
+          &lt;mi&gt;i&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;1&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;C&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;1&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;+&lt;/mo&gt;
+      &lt;/mtd&gt;
+    &lt;/mtr&gt;
+    &lt;mtr&gt;
+      &lt;mtd /&gt;
+      &lt;mtd&gt;
+        &lt;mi&gt;f&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msubsup&gt;
+          &lt;mi&gt;t&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/mrow&gt;
+          &lt;mo&gt;&amp;#x2217;&lt;!-- ∗ --&gt;&lt;/mo&gt;
+        &lt;/msubsup&gt;
+        &lt;mo&gt;;&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;t&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B1;&lt;!-- α --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;H&lt;/mi&gt;
+          &lt;mi&gt;i&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;1&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;C&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;0&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;+&lt;/mo&gt;
+      &lt;/mtd&gt;
+    &lt;/mtr&gt;
+    &lt;mtr&gt;
+      &lt;mtd /&gt;
+      &lt;mtd&gt;
+        &lt;mi&gt;f&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msubsup&gt;
+          &lt;mi&gt;t&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/mrow&gt;
+          &lt;mo&gt;&amp;#x2217;&lt;!-- ∗ --&gt;&lt;/mo&gt;
+        &lt;/msubsup&gt;
+        &lt;mo&gt;;&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;t&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B1;&lt;!-- α --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;H&lt;/mi&gt;
+          &lt;mi&gt;i&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;0&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;C&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;1&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;+&lt;/mo&gt;
+      &lt;/mtd&gt;
+    &lt;/mtr&gt;
+    &lt;mtr&gt;
+      &lt;mtd /&gt;
+      &lt;mtd&gt;
+        &lt;mi&gt;f&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msubsup&gt;
+          &lt;mi&gt;t&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+            &lt;mi&gt;j&lt;/mi&gt;
+          &lt;/mrow&gt;
+          &lt;mo&gt;&amp;#x2217;&lt;!-- ∗ --&gt;&lt;/mo&gt;
+        &lt;/msubsup&gt;
+        &lt;mo&gt;;&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03C4;&lt;!-- τ --&gt;&lt;/mi&gt;
+          &lt;mrow class="MJX-TeXAtom-ORD"&gt;
+            &lt;mi&gt;t&lt;/mi&gt;
+            &lt;mi&gt;i&lt;/mi&gt;
+          &lt;/mrow&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B2;&lt;!-- β --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;,&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;&amp;#x03B1;&lt;!-- α --&gt;&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;H&lt;/mi&gt;
+          &lt;mi&gt;i&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;0&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+        &lt;mo&gt;&amp;#x00D7;&lt;!-- × --&gt;&lt;/mo&gt;
+        &lt;mi&gt;P&lt;/mi&gt;
+        &lt;mo stretchy="false"&gt;(&lt;/mo&gt;
+        &lt;msub&gt;
+          &lt;mi&gt;C&lt;/mi&gt;
+          &lt;mi&gt;j&lt;/mi&gt;
+        &lt;/msub&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mn&gt;0&lt;/mn&gt;
+        &lt;mo stretchy="false"&gt;)&lt;/mo&gt;
+      &lt;/mtd&gt;
+    &lt;/mtr&gt;
+  &lt;/mtable&gt;
+&lt;/math&gt;
+
+&lt;br&gt;
+
+**A very simplified version of corresponding model syntax in Stan:**
+
+.tiny[
+
+```r
+for(i in 1:N)
+  for (j in 1:I) {
+    
+      real p_t = beta[j] - tau_t[i];
+      real p_c = beta[j] - tau_c[i];
+      
+      real lprt1 = log1m(pC[j]) + log1m(pH[i]) + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt2 = log1m(pC[j]) + log(pH[i])   + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt3 =  log(pC[j])  + log1m(pH[i]) + normal_lpdf(Y[i,j] | p_t, 1/alpha[j]));  
+      real lprt4 =  log(pC[j])  + log(pH[i])   + normal_lpdf(Y[i,j] | p_c, 1/alpha[j]));  
+      
+      target += log_sum_exp([lprt1, lprt2, lprt3, lprt4]);
+  }
+}
+```
+]
+
+---
+
+### Dataset description
+
+- I used a random sample of 1000 examinees from Form A with 171 items. 
+
+- This subset of Form A
+
+  - had 50 operational items that all 1000 examinees responded to, and
+
+  - had 121 pilot items that a different set of 100-150 examinees responded to. 
+  
+- Each examinee responded to 65 items (50 operational + 15 pilot items)
+
+Data structure was relatively sparse due to missing data by design for the pilot items. Only 38% of the data matrix was complete.
+
+![](data.PNG)
+
+---
+
+### Model Fitting
+
+- The model was fitted using Bayesian estimation through the `rstan` package (Stan Development Team,
+2018) in R (R Core Team, 2018).
+
+- There were four chains using 1,000 iterations, and model parameter estimates from posterior densities were
+calculated using 750 iterations after 250 warm-up iterations. 
+
+- An informal post at the link - https://cengiz.me/posts/dglnrt2/ - includes
+
+  - a more detailed description of the model, 
+  
+  - parameter constraints necessary for model identification,
+  
+  - prior specifications, and
+  
+  - and two example analysis with all relevant R and Stan code.
+
+- The code for the dataset used in this particular presentation can be found in the following Github repo:
+
+.indent[https://github.com/czopluoglu/dglnrt2/tree/main/R/ncme22/dglnrt]
+
+---
+
+
+
+### Results
+
+**Model Convergence**
+
+The model convergence was checked by visual inspection of the sampling chains and with the split-chain `\(\hat{R}\)` statistic.
+
+The split-chain `\(\hat{R}\)` statistic was less than 1.01 for most parameters in the model, with a maximum value of 1.032 for one of the item parameters ( `\(\beta_{30}\)`).
+
+&lt;img src="ncme22_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Results
+
+**Model Convergence**
+
+The inspection of trace plots didn't indicate any pathological behavior during sampling. Below are the trace plots for a random selection from each parameter type.
+
+&lt;img src="ncme22_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Results
+
+**Probability Estimates of Being Compromised for Operational and Pilot Items**
+
+.pull-left[
+
+&lt;center&gt; IT Certification Data &lt;/center&gt;
+
+&lt;img src="ncme22_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- The probability estimates of being compromised ranged 
+
+  - from 0.71 to 0.99 with a mean of 0.96 for **50 operational items**.
+
+  - from 0.13 to 0.91 with a mean of 0.58 for **121 pilot items**.
+
+- If we use 0.91 as a cut-off point, the model indicated that 47 out of 50 operational items were potentially compromised.
+
+]
+
+---
+
+### Results
+
+**Probability Estimates of Being Compromised for Operational and Pilot Items**
+
+.pull-left[
+
+&lt;center&gt; Simulated Data - Null Condition &lt;/center&gt;
+
+&lt;img src="ncme22_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- To observe the model behavior for the same set of parameters of being compromised, we simulated data with no item preknowledge.
+
+- While simulating data, we used the estimates from real data analysis for the item parameters ( `\(\beta\)`, `\(\alpha\)`) and true latent speed parameters ( `\(\tau_t\)`). The exact structure of missingness was replicated by replacing values with NAs. 
+
+- The distribution of the estimates of being compromised for simulated null condition indicated that the model was picking up some signals in the real data for the operational items.
+
+]
+
+---
+
+### Results
+
+**Probability Estimates of Item Preknowledge for Examinees**
+
+.pull-left[
+
+&lt;img src="ncme22_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- The probability estimates of having item preknowledge 
+
+  - from 0.04 to 0.98 with a mean of 0.54 for 1000 real examinees in the IT Certification dataset.
+
+  - from 0.43 to 0.64 with a mean of 0.58 for 100 simulees in the null condition.
+
+- If we use 0.9 as a cut-off point, the model indicated that 96 out of 1000 examinees had potentially accessed some compromised items before the test.
+]
+
+---
+
+
+  
+  
+### Results
+
+**Comparison of Model Identified Subgroup (N = 96) and Others (N=904)**
+
+- Average Response Time
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-z1yq{font-size:13px;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-z1yq"&gt;&lt;/th&gt;
+    &lt;th class="tg-z1yq"&gt;Model Identified &lt;br&gt; Subset of Items &lt;br&gt; P(C=1) &amp;gt; 0.91 (N=47)&lt;/th&gt;
+    &lt;th class="tg-z1yq"&gt;Other Items &lt;br&gt; P(C=1) &amp;lt;0.91 (N=124) &lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-z1yq"&gt;Other Examineees &lt;br&gt; P(H=1) &amp;lt;0.9&lt;/td&gt;
+    &lt;td class="tg-z1yq"&gt;98.2&lt;/td&gt;
+    &lt;td class="tg-z1yq"&gt;103.8&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-z1yq"&gt;Model Identified Subgroup of Examinees &lt;br&gt; P(H=1) &amp;gt; 0.9&lt;/td&gt;
+    &lt;td class="tg-z1yq"&gt;33.5&lt;/td&gt;
+    &lt;td class="tg-z1yq"&gt;86.1&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+- Other characteristics: country, online proctoring, voucher misuse, flagged by company (RSI)
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-baqh"&gt;&lt;/th&gt;
+    &lt;th class="tg-baqh"&gt;Other &lt;br&gt; Examinees (N = 904)&lt;/th&gt;
+    &lt;th class="tg-baqh"&gt;Model Identified &lt;br&gt;Subgroup of Examinees (N=96)&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Country X&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;18.8%&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;64.5%&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Online Proctoring&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;61.5%&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;100%&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Voucher Misuse&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;11.2%&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;78.1%&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Flagged by the company&lt;br&gt;(RSI)&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10.8%&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;93.8%&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+### Concluding Remarks
+
+- I can argue that a certain subgroup of examinees responded significantly faster to operational items than the rest of the group.
+  
+- The proposed model 
+
+  - is designed to pick such a signal and were successfully fitted to a random sample from the dataset,
+  
+  - successfully separated a particular group of examinees in the data from the rest of the group by estimating the probability of item preknowledge for each examinee,
+  
+  - successfully separated operational items from the pilot items by estimating a probability of being compromised for each item.
+  
+- In the context of this presentation, I tend to interpret faster response times as an indication of item preknowledge. If there are other plausible explanations for faster response times in operational items for this subgroup of examinees, this inference is void.
+
+- The idea can be extended and used for response accuracy data (work in progress!)
+
+- Response time and response accuracy pieces can be combined. It becomes a very complex model but can potentially yield the highest performance (work in progress!)
+  
+---
+
+### Limitations
+
+- There are some, but I am sorry I am running out of time :)
+
+&lt;br&gt;
+&lt;br&gt; 
+&lt;br&gt;
+
+&lt;center&gt;
+
+## Thank you!
+
+&lt;br&gt;
+
+### Questions --&gt; cengiz@uoregon.edu
+  
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
